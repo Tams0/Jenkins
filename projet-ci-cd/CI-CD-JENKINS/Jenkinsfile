@@ -1,0 +1,36 @@
+pipeline {
+    agent any
+
+    environment {
+        DISCORD_WEBHOOK = credentials('DISCORD_WEBHOOK') // ID du credential Jenkins
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://git.interne.local/projet.git' // ton repo interne
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'echo "Build en cours..."'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'echo "Exécution des tests..."'
+            }
+        }
+    }
+
+    post {
+        success {
+            discordSend description: "✅ Build SUCCESS", webhookURL: "${DISCORD_WEBHOOK}"
+        }
+        failure {
+            discordSend description: "❌ Build FAILED", webhookURL: "${DISCORD_WEBHOOK}"
+        }
+    }
+}
